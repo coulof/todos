@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+    name: todos
+    namespace: {{ .Values.ns }}
+---
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+    name: todos{{ .Values.tag }}
+    namespace: {{ .Values.ns }}
+spec:
+    serviceName: todos{{ .Values.tag }}
+    selector:
+        matchLabels:
+          app: todos{{ .Values.tag }}
+    template:
+      metadata:
+        labels:
+          app: todos{{ .Values.tag }}
+      spec:
+        serviceAccount: todos
+        containers:
+          - name: todos{{ .Values.tag }}
+            image: docker.io/coulof/todos:{{ .Values.tag }}
+            imagePullPolicy: Always
+            env:
+            - name: COMMIT
+              value: "{{ .Values.commit }}"
+            volumeMounts:
+              - mountPath: "/opt/todos/data/"
+                name: todosdb{{ .Values.tag }}
+        volumes:
+          - name: todosdb{{ .Values.tag }}
+            persistentVolumeClaim:
+              claimName: todosdb{{ .Values.tag }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: todos-{{ .Values.tag }}
+spec:
+  selector:
+    app: todos{{ .Values.tag }}
+  # type: LoadBalancer
+  clusterIP: {{ .Values.cip }}
+  ports:
+    - port: 80
+      targetPort: 4567

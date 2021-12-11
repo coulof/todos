@@ -1,0 +1,32 @@
+{{ if eq .Values.tag "latest"}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: todosdb{{ .Values.tag }}
+  namespace: {{ .Values.ns }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: {{ .Values.sc }}
+{{ else }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: todosdb{{ .Values.tag }}
+  namespace: {{ .Values.ns }}
+spec:
+  storageClassName: {{ .Values.sc }}
+  dataSource:
+    name: todosdblatest-snap-{{ .Values.tag }}
+    kind: VolumeSnapshot
+    apiGroup: snapshot.storage.k8s.io
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+{{ end }}

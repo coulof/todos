@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: storagequota
+  namespace: dev-deployment
+spec:
+  hard:
+    persistentvolumeclaims: "1"
+    requests.storage: "5Gi"

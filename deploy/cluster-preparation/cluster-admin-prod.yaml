@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: read-pods-proto-todos-3-prod
+  namespace: kube-system
+subjects:
+  - kind: ServiceAccount
+    name: proto-todos-3-prod-service-account
+    namespace: proto-todos-3-prod
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: rbac.authorization.k8s.io

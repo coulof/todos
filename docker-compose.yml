@@ -1,0 +1,18 @@
+version: "3.7"
+
+services:
+  www:
+    image: coulof/todos
+    environment:
+      REDIS_HOST: redis
+    ports:
+        - 4567:4567
+  redis:
+    image: redis 
+    command: redis-server --save 60 1
+    volumes:
+        - data:/data
+    restart: always
+
+volumes:
+  data:

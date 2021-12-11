@@ -1,0 +1,65 @@
+stages:
+ - build
+ - deploy
+
+services:
+  - docker:18-dind
+
+variables:
+  DOCKER_HOST: tcp://localhost:2375
+  DOCKER_DRIVER: overlay2
+
+build-dev:
+  stage: build
+  image: docker:18
+  script:
+    - docker pull coulof/todos:${CI_COMMIT_REF_NAME} || true
+    - docker build --cache-from coulof/todos:${CI_COMMIT_REF_NAME} -t coulof/todos:${CI_COMMIT_REF_NAME} .
+    - docker login -u ${DOCKERHUB_USERNAME} -p "${DOCKERHUB_PASSWORD}" docker.io
+    - docker push coulof/todos:${CI_COMMIT_REF_NAME}
+  except:
+   - master
+
+build-master:
+  stage: build
+  image: docker:18
+  script:
+    - docker build -t coulof/todos:latest .
+    - docker login -u ${DOCKERHUB_USERNAME} -p "${DOCKERHUB_PASSWORD}" docker.io
+    - docker push coulof/todos:latest
+  only:
+   - master
+
+deploy_dev:
+  stage: deploy
+  image: alpine/helm:2.13.1
+  environment:
+    name: dev
+    url: http://.lss.emc.com:40080
+    on_stop: stop_dev_environment
+  script:
+  - helm upgrade todos-${CI_COMMIT_REF_NAME} ./deploy/todos --install --force --namespace ${KUBE_NAMESPACE_DEV} --set ns=${KUBE_NAMESPACE_DEV},tag=${CI_COMMIT_REF_NAME},commit=${CI_COMMIT_SHORT_SHA},cip=10.233.51.101,sc=powermax --wait --timeout 600 --debug
+  except:
+  - master
+
+stop_dev_environment:
+  stage: deploy
+  image: alpine/helm:2.13.1
+  variables:
+    GIT_STRATEGY: none
+  script: helm delete --purge todos-${CI_COMMIT_REF_NAME}
+  when: manual
+  environment:
+    name: dev
+    action: stop
+
+deploy_prod:
+  stage: deploy
+  image: alpine/helm:2.13.1
+  environment:
+    name: prod
+    url: http://.lss.emc.com:50080
+  script:
+  - helm upgrade todos-${CI_COMMIT_REF_NAME} ./deploy/todos --install --force --namespace ${KUBE_NAMESPACE_PROD} --set ns=${KUBE_NAMESPACE_PROD},tag=latest,commit=${CI_COMMIT_SHORT_SHA},cip=10.233.48.84,sc=powermax --wait --timeout 600
+  only:
+  - master
