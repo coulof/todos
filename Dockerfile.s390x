@@ -1,6 +1,6 @@
-FROM s390x/ruby:3-alpine
+FROM s390x/ruby:3
 
-
+#RUN apt-get update && apt-get install -y redis
 
 WORKDIR /opt/todos/
 
