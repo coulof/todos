@@ -1,4 +1,4 @@
-sc: powermax
+sc: powermax-iscsi
 tag: latest
 service:
   type: NodePort #ClusterIP
