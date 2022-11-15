@@ -1,0 +1,25 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  IMAGE: coulof/todos
+
+tasks:
+  build-z:
+    cmds:
+      - docker buildx build -o type=registry -t {{ .IMAGE }} --platform=linux/s390x -f Dockerfile.s390x .
+
+  build:
+    cmds:
+      - docker build -t {{ .IMAGE }} -f Dockerfile .
+
+  run-local:
+    cmds:
+      - docker run --name redis -v ${PWD}:/data -p 6379:6379 -d redis redis-server --save 60 1 --loglevel verbose
+      - ruby server.rb
+  
+  run-docker-compose:
+    cmds:
+      - docker-compose up -d
+

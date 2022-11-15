@@ -2,13 +2,13 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
     name: todos
-    namespace: {{ .Values.ns }}
+    namespace: {{ .Release.Namespace }}
 ---
 kind: StatefulSet
 apiVersion: apps/v1
 metadata:
     name: todos{{ .Values.tag }}
-    namespace: {{ .Values.ns }}
+    namespace: {{ .Release.Namespace }}
 spec:
     serviceName: todos{{ .Values.tag }}
     selector:
@@ -43,7 +43,7 @@ spec:
   selector:
     app: todos{{ .Values.tag }}
   # type: LoadBalancer
-  clusterIP: {{ .Values.cip }}
+  # clusterIP: {{ .Values.cip }}
   ports:
     - port: 80
       targetPort: 4567

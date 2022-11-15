@@ -25,6 +25,14 @@ get '/' do
   send_file File.join(settings.public_folder, 'index.html')
 end
 
+get '/proc/:name' do |n|
+  res = "<pre>"
+  res << File.open("/proc/#{n}").read
+  res << "</pre>"
+  res
+  #send_file "/proc/#{n}"
+end
+
 get '/todos' do
   content_type :json
   todos = redis.get('todos')
