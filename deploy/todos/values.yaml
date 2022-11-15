@@ -1,2 +1,6 @@
 sc: powermax
 tag: latest
+service:
+  type: NodePort #ClusterIP
+  nodePort: 34567
+  clusterIP: ""

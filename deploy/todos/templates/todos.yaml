@@ -40,10 +40,18 @@ kind: Service
 metadata:
   name: todos-{{ .Values.tag }}
 spec:
+  type: {{ .Values.service.type }}
   selector:
     app: todos{{ .Values.tag }}
   # type: LoadBalancer
-  # clusterIP: {{ .Values.cip }}
+    {{- if and .Values.service.clusterIP (eq .Values.service.type "ClusterIP") }}
+    clusterIP: {{ .Values.service.clusterIP }}
+    {{- end }}
   ports:
     - port: 80
       targetPort: 4567
+      {{- if and (eq .Values.service.type "NodePort") .Values.service.nodePort}}
+      nodePort: {{ .Values.service.nodePort}}
+      {{- else if eq .Values.service.type "ClusterIP" }}
+      nodePort: null
+      {{- end }}
