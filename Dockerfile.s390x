@@ -14,5 +14,5 @@ RUN gem install 'json_pure' 'sinatra' 'redis' 'webrick'
 # Persistent volumes
 EXPOSE 4567
 
-CMD ["bundle", "exec", "ruby", "server.rb"]
+CMD ["ruby", "server.rb"]
 

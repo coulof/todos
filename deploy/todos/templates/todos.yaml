@@ -1,44 +1,36 @@
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-    name: todos
-    namespace: {{ .Release.Namespace }}
----
-kind: StatefulSet
 apiVersion: apps/v1
+kind: Deployment
 metadata:
-    name: todos{{ .Values.tag }}
-    namespace: {{ .Release.Namespace }}
+  name: todos{{ .Values.tag }}
+  namespace: {{ .Release.Namespace }}
 spec:
-    serviceName: todos{{ .Values.tag }}
-    selector:
-        matchLabels:
-          app: todos{{ .Values.tag }}
-    template:
-      metadata:
-        labels:
-          app: todos{{ .Values.tag }}
-      spec:
-        serviceAccount: todos
-        containers:
-          - name: todos{{ .Values.tag }}
-            image: docker.io/coulof/todos:{{ .Values.tag }}
-            imagePullPolicy: Always
-            env:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todos{{ .Values.tag }}
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: todos{{ .Values.tag }}
+    spec:
+      containers:
+        - name: www
+          image: docker.io/coulof/todos:{{ .Values.tag }}
+          env:
             - name: COMMIT
               value: "{{ .Values.commit }}"
-            volumeMounts:
-              - mountPath: "/opt/todos/data/"
-                name: todosdb{{ .Values.tag }}
-        volumes:
-          - name: todosdb{{ .Values.tag }}
-            persistentVolumeClaim:
-              claimName: todosdb{{ .Values.tag }}
+            - name: REDIS_HOST
+              value: redis
+            - name: REDIS_PORT
+              value: "6379" 
+      restartPolicy: Always
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: todos-{{ .Values.tag }}
+  namespace: {{ .Release.Namespace }}
 spec:
   type: {{ .Values.service.type }}
   selector:

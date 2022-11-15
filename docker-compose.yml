@@ -13,6 +13,8 @@ services:
     volumes:
         - data:/data
     restart: always
-
+    ports:
+        - 4567:4567
+ 
 volumes:
   data:

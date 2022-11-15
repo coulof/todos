@@ -1,10 +1,9 @@
-apiVersion: snapshot.storage.k8s.io/v1alpha1
-kind: VolumeSnapshot
-metadata:
-  name: todosdblatest-snap-{{ .Values.tag }}
-  namespace: {{ .Release.Namespace }}
-spec:
-  snapshotClassName: {{ .Values.sc }}-snapclass
-  source:
-    name: todosdblatest
-    kind: PersistentVolumeClaim
+# apiVersion: snapshot.storage.k8s.io/v1
+# kind: VolumeSnapshot
+# metadata:
+#   name: todosdblatest-snap-{{ .Values.tag }}
+#   namespace: {{ .Release.Namespace }}
+# spec:
+#   volumeSnapshotClassName: {{ .Values.sc }}-snapclass
+#   source:
+#     persistentVolumeClaimName: todosdblatest

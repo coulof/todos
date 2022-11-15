@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+    name: redis
+    namespace: {{ .Release.Namespace }}
+---
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+    name: redis{{ .Values.tag }}
+    namespace: {{ .Release.Namespace }}
+spec:
+    serviceName: redis{{ .Values.tag }}
+    selector:
+        matchLabels:
+          app: redis{{ .Values.tag }}
+    template:
+      metadata:
+        labels:
+          app: redis{{ .Values.tag }}
+      spec:
+        serviceAccount: redis
+        containers:
+          - name: redis
+            image: docker.io/redis:latest
+            args:
+            - redis-server
+            - --save
+            - "60"
+            - "1"
+            volumeMounts:
+              - mountPath: /data
+                name: todosdb{{ .Values.tag }}
+        volumes:
+          - name: todosdb{{ .Values.tag }}
+            persistentVolumeClaim:
+              claimName: todosdb{{ .Values.tag }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+spec:
+  ports:
+    - name: "6379"
+      port: 6379
+      targetPort: 6379

@@ -23,3 +23,10 @@ tasks:
     cmds:
       - docker-compose up -d
 
+  deploy:
+    cmds:
+      - helm install todos todos/ --namespace default --set sc=powermax-iscsi
+   
+  uninstall:
+    cmds:
+      - helm uninstall -n default todos
