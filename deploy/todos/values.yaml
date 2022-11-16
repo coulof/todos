@@ -1,4 +1,5 @@
 sc: powermax-iscsi
+vsc: powermax-snap
 tag: latest
 service:
   type: NodePort #ClusterIP
