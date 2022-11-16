@@ -1,4 +1,3 @@
-#{{ if not eq .Values.tag "latest"}}
 apiVersion: snapshot.storage.k8s.io/v1
 kind: VolumeSnapshot
 metadata:
@@ -8,4 +7,3 @@ spec:
   volumeSnapshotClassName: {{ .Values.vsc }}-snapclass
   source:
     persistentVolumeClaimName: todosdblatest
-#{{ end }}
